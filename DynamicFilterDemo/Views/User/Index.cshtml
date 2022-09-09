@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Users";
+}
+
+<div class="row mb-2">
+    <div class="col-md-12">
+        <button class="btn btn-primary">Filtre</button>
+        <button id="BtnRefresh" class="btn btn-success" type="button">Yenile</button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-2">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <label>Id</label>
+                    <div class="col-md-6">
+                        <select class="form-select">
+                            <option>Seçiniz</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="number" id="Id" name="Id" class="form-control" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-body">
+                <table id="UserGrid" class="table table-striped table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>İşlemler</th>
+                            <th>Id</th>
+                            <th>Ad</th>
+                            <th>Soyad</th>
+                            <th>E-mail</th>
+                            <th>Yaş</th>
+                            <th>Aktif Mi?</th>
+                            <th>Silinmiş Mi?</th>
+                            <th>Oluşturulma Tarihi</th>
+                            <th>Güncelleme Tarihi</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+@section Scripts
+    {
+    <script src="~/js/user.js"></script>
+}
