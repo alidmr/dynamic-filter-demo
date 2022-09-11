@@ -26,13 +26,22 @@ namespace DynamicFilterDemo.Extensions
         public static IQueryable<T> ToDynamic<T>(
             this IQueryable<T> query, DynamicFilter dynamic)
         {
-            if (dynamic.Filter is not null) query = Filter(query, dynamic.Filter);
-            if (dynamic.Sort is not null && dynamic.Sort.Any()) query = Sort(query, dynamic.Sort);
+            if (dynamic is not null)
+            {
+                if (dynamic.Filter is not null)
+                {
+                    query = Filter(query, dynamic.Filter);
+                }
+                if (dynamic.Sort is not null && dynamic.Sort.Any())
+                {
+                    query = Sort(query, dynamic.Sort);
+                }
+            }
+
             return query;
         }
 
-        private static IQueryable<T> Filter<T>(
-            IQueryable<T> queryable, Filter filter)
+        private static IQueryable<T> Filter<T>(IQueryable<T> queryable, Filter filter)
         {
             IList<Filter> filters = GetAllFilters(filter);
             string?[] values = filters.Select(f => f.Value).ToArray();
@@ -42,8 +51,7 @@ namespace DynamicFilterDemo.Extensions
             return queryable;
         }
 
-        private static IQueryable<T> Sort<T>(
-            IQueryable<T> queryable, IEnumerable<SortFilter> sort)
+        private static IQueryable<T> Sort<T>(IQueryable<T> queryable, IEnumerable<SortFilter> sort)
         {
             if (sort.Any())
             {
@@ -65,8 +73,12 @@ namespace DynamicFilterDemo.Extensions
         {
             filters.Add(filter);
             if (filter.Filters is not null && filter.Filters.Any())
+            {
                 foreach (Filter item in filter.Filters)
+                {
                     GetFilters(item, filters);
+                }
+            }
         }
 
         public static string Transform(Filter filter, IList<Filter> filters)
@@ -78,13 +90,19 @@ namespace DynamicFilterDemo.Extensions
             if (!string.IsNullOrEmpty(filter.Value))
             {
                 if (filter.Operator == "doesnotcontain")
+                {
                     where.Append($"(!np({filter.Field}).{comparison}(@{index}))");
+                }
                 else if (comparison == "StartsWith" ||
                          comparison == "EndsWith" ||
                          comparison == "Contains")
+                {
                     where.Append($"(np({filter.Field}).{comparison}(@{index}))");
+                }
                 else
+                {
                     where.Append($"np({filter.Field}) {comparison} @{index}");
+                }
             }
             else if (filter.Operator == "isnull" || filter.Operator == "isnotnull")
             {
@@ -92,8 +110,11 @@ namespace DynamicFilterDemo.Extensions
             }
 
             if (filter.Logic is not null && filter.Filters is not null && filter.Filters.Any())
-                return
-                    $"{where} {filter.Logic} ({string.Join($" {filter.Logic} ", filter.Filters.Select(f => Transform(f, filters)).ToArray())})";
+            {
+                var array = filter.Filters.Select(f => Transform(f, filters)).ToArray();
+                var item = $"{where} {filter.Logic} ({string.Join($" {filter.Logic} ", array)})";
+                return item;
+            }
 
             return where.ToString();
         }

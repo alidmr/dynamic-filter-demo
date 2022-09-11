@@ -15,7 +15,7 @@ function LoadGrid() {
         responsive: true,
         "lengthMenu": [5, 10, 25, 50, 100, 1000],
         ajax: {
-            url: '/User/GetItems',
+            url: '/User/GetUserList',
             type: 'POST',
             error: function (xhr, error, thrown) {
                 console.log("Error occurred!");
@@ -30,12 +30,45 @@ function LoadGrid() {
                     return false;
                 }
             },
+            dataType: 'json',
             data: function (data) {
                 var colName;
                 var sort = data.order[0].column;
                 if (!data['columns'][sort]['data'] == '')
                     colName = data['columns'][sort]['data'] + ' ' + data.order[0].dir;
                 else colName = data['columns'][1]['name'] + " desc";  // Id desc
+
+                var searchForm = $('form.SearchForm');
+
+                var formItems = searchForm.serializeArray();
+
+                var filterItems = {};
+                var filterList = new Array();
+
+                $.each(formItems, function () {
+                    if (filterItems[this.name]) {
+                        if (!filterItems[this.name].push) {
+                            filterItems[this.name] = [filterItems[this.name]];
+                        }
+                        filterItems[this.name].push(this.value || '');
+                    } else {
+                        if (this.value != undefined && this.value != '' && this.value != 'select') {
+                            if (!this.name.includes('_ConditionType')) {
+                                var inputValue = this.value;
+                                var conditionTypeValue = $('#' + this.name + '_ConditionType').val();
+                                var filterItem = {
+                                    'propertyName': this.name,
+                                    'operatorType': conditionTypeValue,
+                                    'value': inputValue
+                                };
+                                filterList.push(filterItem);
+                            }
+
+                            //filterItems[this.name] = this.value
+                        }
+                        //filterItems[this.name] = this.value || '';
+                    }
+                });
 
                 var colFilter, col;
                 var arr = {
@@ -47,6 +80,18 @@ function LoadGrid() {
                     'sortColumn': data['columns'][sort]['name'],
                     'sortBy': data.order[0].dir
                 };
+                //var checkItem = jQuery.isEmptyObject(filterItems);
+
+                //if (!checkItem) {
+                //    var filterParameters = JSON.stringify(filterItems);
+                //    arr['parameters'] = filterParameters;
+                //}
+
+                if (filterList.length > 0) {
+                    var filterParameters = JSON.stringify(filterList);
+                    arr['parameters'] = filterParameters;
+                }
+
                 data['columns'].forEach(function (items, index) {
                     col = data['columns'][index]['name'];
                     colFilter = data['columns'][index]['search']['value'];
@@ -234,15 +279,27 @@ $(document).ready(function () {
 
     $('#BtnClear').click(function (event) {
         event.preventDefault();
-        $('#SearchForm').find("input[type=text], input[type=email], input[type=number], textarea, select ").each(function () {
+        $('form.SearchForm').find("input[type=text], input[type=email], input[type=number], textarea ").each(function () {
             $(this).val('');
         });
+
+        $('form.SearchForm').find("select ").each(function () {
+            $(this).val('select');
+        });
+
         LoadGrid();
     });
 
     $('#BtnRefresh').click(function (event) {
         event.preventDefault();
         LoadGrid();
+    });
+
+    $('#BtnFilter').click(function (event) {
+        event.preventDefault();
+        $('#FilterDiv').removeClass("displayNone");
+        //@colSize = 10;
+        
     });
 
 });

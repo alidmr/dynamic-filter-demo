@@ -1,29 +1,144 @@
 ﻿@{
     ViewData["Title"] = "Users";
+
+    var colSize = 12;
 }
 
 <div class="row mb-2">
     <div class="col-md-12">
-        <button class="btn btn-primary">Filtre</button>
+        <button id="BtnFilter" class="btn btn-primary" type="button">Filtre</button>
         <button id="BtnRefresh" class="btn btn-success" type="button">Yenile</button>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-md-2">
+    <div class="col-md-2" id="FilterDiv">
         <div class="card">
             <div class="card-body">
-                <div class="row">
-                    <label>Id</label>
-                    <div class="col-md-6">
-                        <select class="form-select">
-                            <option>Seçiniz</option>
-                        </select>
+                <form class="SearchForm" id="UserSearchForm">
+                    <div class="row">
+                        <label>Id</label>
+                        <div class="col-md-6">
+                            <input type="number" id="Id" name="Id" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-select" id="Id_ConditionType" name="Id_ConditionType">
+                                <option value="select">Seçiniz</option>
+                                <option value="8">Eşit</option>
+                                <option value="9">Eşit Değil</option>
+                                <option value="4">Küçük</option>
+                                <option value="5">Küçük Eşit</option>
+                                <option value="2">Büyük</option>
+                                <option value="3">Büyük Eşit</option>
+                                <option value="6">Bununla Başlayan</option>
+                                <option value="7">Bununla Biten</option>
+                                <option value="1">İçerisinde</option>
+                                <option value="10">İçerisinde Değil</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <input type="number" id="Id" name="Id" class="form-control" />
+                    <div class="row">
+                        <label>Ad</label>
+                        <div class="col-md-6">
+                            <input type="text" id="FirstName" name="FirstName" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-select" id="FirstName_ConditionType" name="FirstName_ConditionType">
+                                <option value="select">Seçiniz</option>
+                                <option value="8">Eşit</option>
+                                <option value="9">Eşit Değil</option>
+                                <option value="4">Küçük</option>
+                                <option value="5">Küçük Eşit</option>
+                                <option value="2">Büyük</option>
+                                <option value="3">Büyük Eşit</option>
+                                <option value="6">Bununla Başlayan</option>
+                                <option value="7">Bununla Biten</option>
+                                <option value="1">İçerisinde</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
+                    <div class="row">
+                        <label>Soyad</label>
+                        <div class="col-md-6">
+                            <input type="text" id="LastName" name="LastName" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-select" id="LastName_ConditionType" name="LastName_ConditionType">
+                                <option value="select">Seçiniz</option>
+                                <option value="8">Eşit</option>
+                                <option value="9">Eşit Değil</option>
+                                <option value="4">Küçük</option>
+                                <option value="5">Küçük Eşit</option>
+                                <option value="2">Büyük</option>
+                                <option value="3">Büyük Eşit</option>
+                                <option value="6">Bununla Başlayan</option>
+                                <option value="7">Bununla Biten</option>
+                                <option value="1">İçerisinde</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label>Email</label>
+                        <div class="col-md-6">
+                            <input type="text" id="Email" name="Email" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-select" id="Email_ConditionType" name="Email_ConditionType">
+                                <option value="select">Seçiniz</option>
+                                <option value="8">Eşit</option>
+                                <option value="9">Eşit Değil</option>
+                                <option value="4">Küçük</option>
+                                <option value="5">Küçük Eşit</option>
+                                <option value="2">Büyük</option>
+                                <option value="3">Büyük Eşit</option>
+                                <option value="6">Bununla Başlayan</option>
+                                <option value="7">Bununla Biten</option>
+                                <option value="1">İçerisinde</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label>Yaş</label>
+                        <div class="col-md-6">
+                            <input type="number" min="0" id="Age" name="Age" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-select" id="Age_ConditionType" name="Age_ConditionType">
+                                <option value="select">Seçiniz</option>
+                                <option value="8">Eşit</option>
+                                <option value="9">Eşit Değil</option>
+                                <option value="4">Küçük</option>
+                                <option value="5">Küçük Eşit</option>
+                                <option value="2">Büyük</option>
+                                <option value="3">Büyük Eşit</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Aktif Mi</label>
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-select" id="IsActive_ConditionType" name="IsActive_ConditionType">
+                                <option value="select">Seçiniz</option>
+                                <option value="11">Evet</option>
+                                <option value="12">Hayır</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-md-12">
+                            <div class="d-flex justify-content-center">
+                                <button class="btn btn-danger mx-xl-2" type="button" id="BtnClear">Temizle</button>
+                                <button class="btn btn-success" type="button" id="BtnSearch">Filtrele</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
             </div>
         </div>
     </div>
@@ -56,4 +171,5 @@
 @section Scripts
     {
     <script src="~/js/user.js"></script>
+
 }

@@ -1,4 +1,5 @@
-﻿using DynamicFilterDemo.Models.Response;
+﻿using DynamicFilterDemo.Dynamics;
+using DynamicFilterDemo.Models.Response;
 using DynamicFilterDemo.Models.Users;
 
 namespace DynamicFilterDemo.Services
@@ -8,5 +9,9 @@ namespace DynamicFilterDemo.Services
         Task SeedData();
 
         Task<BaseDataTableResponseModel<UserViewModel>> GetUsers(UserSearchViewModel model);
+
+        Task<BaseDataTableResponseModel<UserViewModel>> GetUsers(DynamicFilter filter, int page, int pageSize, int draw);
+
+        BaseDataTableResponseModel<UserViewModel> GetUserList(UserSearchViewModel model);
     }
 }

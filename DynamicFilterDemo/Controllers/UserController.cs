@@ -1,6 +1,10 @@
-﻿using DynamicFilterDemo.Models.Users;
+﻿using DynamicFilterDemo.Dynamics;
+using DynamicFilterDemo.Filters;
+using DynamicFilterDemo.Models.Users;
 using DynamicFilterDemo.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Newtonsoft.Json;
 
 namespace DynamicFilterDemo.Controllers
 {
@@ -19,17 +23,77 @@ namespace DynamicFilterDemo.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetItems(UserSearchViewModel model)
+        public async Task<IActionResult> GetItems(UserSearchViewModel model, string parameters)
         {
-            var result = await _userService.GetUsers(model);
-            return Json(result);
+            try
+            {
+                DynamicFilter dynamicFilter = null;
+
+                if (!string.IsNullOrEmpty(parameters))
+                {
+                    var filterItems = JsonConvert.DeserializeObject<List<Filter>>(parameters);
+                    var filter = new Filter("FirstName", "contains", "Kerem", "and", null);
+
+                    var sortFilter = new List<SortFilter>()
+                    {
+                        new SortFilter(model.SortColumn,model.SortBy)
+                    };
+                    dynamicFilter = new DynamicFilter(sortFilter, filter);
+                }
+
+                var result = await _userService.GetUsers(dynamicFilter, model.Start, model.Length, model.Draw);
+                return Json(result);
+            }
+            catch (Exception exception)
+            {
+                return Json(1);
+            }
         }
 
-
-        private async Task SeedData()
+        [HttpPost]
+        public async Task<IActionResult> GetUsers(UserSearchViewModel model, string parameters)
         {
-            await _userService.SeedData();
+            try
+            {
+                if (!string.IsNullOrEmpty(parameters))
+                {
+                    var filterItems = JsonConvert.DeserializeObject<List<AppFilterItem>>(parameters);
+                    model.Filters = filterItems;
+                }
+
+                var result = await _userService.GetUsers(model);
+
+                return Json(result);
+            }
+            catch (Exception exception)
+            {
+
+                throw;
+            }
         }
+
+        [HttpPost]
+        public IActionResult GetUserList(UserSearchViewModel model, string parameters)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(parameters))
+                {
+                    var filterItems = JsonConvert.DeserializeObject<List<AppFilterItem2>>(parameters);
+                    model.Parameters = filterItems;
+                }
+
+                var result =  _userService.GetUserList(model);
+
+                return Json(result);
+            }
+            catch (Exception exception)
+            {
+
+                throw;
+            }
+        }
+
 
     }
 }

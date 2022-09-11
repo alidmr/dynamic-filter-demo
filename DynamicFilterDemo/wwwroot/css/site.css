@@ -14,8 +14,13 @@
     line-height: 1.5em;
     vertical-align: text-bottom;
 }
-.loading::after {
-    display: inline-table;
-    white-space: pre;
-    text-align: left;
+
+    .loading::after {
+        display: inline-table;
+        white-space: pre;
+        text-align: left;
+    }
+
+.displayNone {
+    display: none;
 }

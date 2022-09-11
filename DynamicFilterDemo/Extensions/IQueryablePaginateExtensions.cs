@@ -13,8 +13,10 @@ namespace DynamicFilterDemo.Extensions
             if (from > index) throw new ArgumentException($"From: {from} > Index: {index}, must from <= Index");
 
             int count = await source.CountAsync(cancellationToken).ConfigureAwait(false);
-            List<T> items = await source.Skip((index - from) * size).Take(size).ToListAsync(cancellationToken)
+
+            List<T> items = await source.Skip(index).Take(size).ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
+
             Paginate<T> list = new()
             {
                 Index = index,
