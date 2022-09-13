@@ -1,4 +1,10 @@
 ﻿
+$(document).ready(function () {
+    $('.select2').select2({
+        placeholder: 'Seçiniz',
+        theme: "classic"
+    });
+});
 
 var removeOption = {};
 

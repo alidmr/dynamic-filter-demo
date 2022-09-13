@@ -1,0 +1,170 @@
+﻿@{
+    ViewData["Title"] = "Ürünler";
+}
+
+<div class="row mb-2">
+    <div class="col-md-12">
+        <button id="BtnRefresh" class="btn btn-success" type="button">
+            <i class="fa fa-refresh"></i> Yenile
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+    </div>
+    <div class="col-md-6">
+        <select class="form-select select2" name="states[]" multiple="multiple">
+            <option value="AL">Alabama</option>
+            <option value="A1">A1</option>
+            <option value="A2">A2</option>
+            <option value="WY">Wyoming</option>
+        </select>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-2" id="FilterDiv">
+        <div class="card">
+            <div class="card-body">
+                <form class="SearchForm" id="ProductSearchForm">
+                    <div class="row">
+                        <label>Id</label>
+                        <div class="col-md-6">
+                            <input type="number" id="Id" name="Id" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-select" id="Id_ConditionType" name="Id_ConditionType">
+                                <option value="8">Eşit</option>
+                                <option value="9">Eşit Değil</option>
+                                <option value="4">Küçük</option>
+                                <option value="5">Küçük Eşit</option>
+                                <option value="2">Büyük</option>
+                                <option value="3">Büyük Eşit</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label>Ad</label>
+                        <div class="col-md-6">
+                            <input type="text" id="Name" name="Name" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-select" id="Name_ConditionType" name="Name_ConditionType">
+                                <option value="8">Eşit</option>
+                                <option value="9">Eşit Değil</option>
+                                <option value="6">Bununla Başlayan</option>
+                                <option value="7">Bununla Biten</option>
+                                <option value="1">İçerisinde</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label>Aktif Mi</label>
+                        <div class="col-md-6">
+                            <select class="form-select" id="IsActive" name="IsActive">
+                                <option value="select">Seçiniz</option>
+                                <option value="true">Evet</option>
+                                <option value="false">Hayır</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-select" id="IsActive_ConditionType" name="IsActive_ConditionType">
+                                <option value="8">Eşit</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label>Oluşturulma Tarihi</label>
+                        <div class="col-md-6">
+                            <input type="date" id="CreatedDate" name="CreatedDate" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-select" id="CreatedDate_ConditionType" name="CreatedDate_ConditionType">
+                                <option value="8">Eşit</option>
+                                <option value="9">Eşit Değil</option>
+                                <option value="4">Küçük</option>
+                                <option value="5">Küçük Eşit</option>
+                                <option value="2">Büyük</option>
+                                <option value="3">Büyük Eşit</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label>Kategori</label>
+                        <div class="col-md-6">
+                            <select class="form-select select2" multiple="multiple" id="CategoryId" name="CategoryId">
+                                <option value="1">Elma</option>
+                                <option value="2">Armut</option>
+                                <option value="3">Portakal</option>
+                                <option value="4">Limon</option>
+                                <option value="5">Mandalina</option>
+                                <option value="6">Kiraz</option>
+                                <option value="7">Kavun</option>
+                                <option value="8">Erik</option>
+                                <option value="9">Çilek</option>
+                                <option value="10">Karpuz</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-select" id="CategoryId_ConditionType" name="CategoryId_ConditionType">
+                                <option value="8">Eşit</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <div class="row mt-2">
+                        <div class="col-md-6 text-center">
+                            <button class="btn btn-danger mx-xl-2" type="button" id="BtnClear">
+                                <i class="fa fa-close"></i> Temizle
+                            </button>
+                        </div>
+                        <div class="col-md-6 text-center">
+                            <button class="btn btn-success" type="button" id="BtnSearch">
+                                <i class="fa fa-search"></i> Filtrele
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-body">
+                <table id="ProductGrid" class="table table-striped table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>İşlemler</th>
+                            <th>Id</th>
+                            <th>Ad</th>
+                            <th>Açıklama</th>
+                            <th>Kategori</th>
+                            <th>Sahibi</th>
+                            <th>Fiyat</th>
+                            <th>Aktif Mi?</th>
+                            <th>Silinmiş Mi?</th>
+                            <th>Oluşturulma Tarihi</th>
+                            <th>Güncelleme Tarihi</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+@section Scripts
+    {
+    <script src="~/js/pages/product.js"></script>
+}

@@ -1,4 +1,5 @@
 ﻿using Bogus;
+using Bogus.DataSets;
 using DynamicFilterDemo.Dynamics;
 using DynamicFilterDemo.Entities;
 using DynamicFilterDemo.Extensions;
@@ -6,7 +7,7 @@ using DynamicFilterDemo.Models.Response;
 using DynamicFilterDemo.Models.Users;
 using DynamicFilterDemo.Repository.Users;
 
-namespace DynamicFilterDemo.Services
+namespace DynamicFilterDemo.Services.Users
 {
     public class UserService : IUserService
     {
@@ -23,38 +24,6 @@ namespace DynamicFilterDemo.Services
 
             await _userRepository.AddRangeAsync(users);
         }
-
-        public async Task<BaseDataTableResponseModel<UserViewModel>> GetUsers(UserSearchViewModel model)
-        {
-            var response = new BaseDataTableResponseModel<UserViewModel>();
-
-            var userQuery = _userRepository.Query();
-
-            var source = userQuery.AsQueryable().ToFilterQuery(model.Filters);
-
-            source = source.Sort(model.SortColumn, model.SortBy);
-
-            var result = await source.ToPaginateAsync(model.Start, model.Length);
-
-            response.Draw = model.Draw;
-            response.RecordsFiltered = result.Count;
-            response.RecordsTotal = result.Count;
-            response.Data = result.Items.Select(u => new UserViewModel()
-            {
-                Id = u.Id,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                Email = u.Email,
-                Age = u.Age,
-                CreatedDate = u.CreatedDate,
-                IsActive = u.IsActive,
-                IsDeleted = u.IsDeleted,
-                UpdatedDate = u.UpdatedDate
-            }).ToList();
-
-            return response;
-        }
-
 
         private List<User> TestSeedData()
         {
@@ -126,18 +95,18 @@ namespace DynamicFilterDemo.Services
             var userQuery = _userRepository.Query();
 
             var query = (from u in userQuery
-                select new UserViewModel()
-                {
-                    Id = u.Id,
-                    FirstName = u.FirstName,
-                    LastName = u.LastName,
-                    Email = u.Email,
-                    Age = u.Age,
-                    CreatedDate = u.CreatedDate,
-                    IsActive = u.IsActive,
-                    IsDeleted = u.IsDeleted,
-                    UpdatedDate = u.UpdatedDate
-                }).AsQueryable();
+                         select new UserViewModel()
+                         {
+                             Id = u.Id,
+                             FirstName = u.FirstName,
+                             LastName = u.LastName,
+                             Email = u.Email,
+                             Age = u.Age,
+                             CreatedDate = u.CreatedDate,
+                             IsActive = u.IsActive,
+                             IsDeleted = u.IsDeleted,
+                             UpdatedDate = u.UpdatedDate
+                         }).AsQueryable();
 
             var result = query.ToDataSource(model.Parameters, model.Start, model.Length);
 

@@ -1,7 +1,10 @@
-﻿using System.Linq.Expressions;
+﻿using System.Diagnostics.Metrics;
+using System.Linq.Expressions;
 using System.Reflection;
+using System.Reflection.Metadata;
 using DynamicFilterDemo.Filters;
-using Microsoft.AspNetCore.Http.Extensions;
+using DynamicFilterDemo.Helpers;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace DynamicFilterDemo.Extensions
 {
@@ -10,8 +13,12 @@ namespace DynamicFilterDemo.Extensions
         private static MethodInfo containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) });
         private static MethodInfo startsWithMethod = typeof(string).GetMethod("StartsWith", new[] { typeof(string) });
         private static MethodInfo endsWithMethod = typeof(string).GetMethod("EndsWith", new[] { typeof(string) });
+        private static MethodInfo intListContainsMethod = typeof(List<int>).GetMethod("Contains", new[] { typeof(int) });
+        private static MethodInfo intListNullableContainsMethod = typeof(List<int?>).GetMethod("Contains", new[] { typeof(int?) });
+        private static MethodInfo listAnyMethod = typeof(Enumerable).GetMethods().First(t => t.Name == "Any" && t.GetParameters().Length == 2).MakeGenericMethod(typeof(int));
 
-        public static Expression<Func<T, bool>> GetExpression<T>(List<AppFilterItem2> filters)
+
+        public static Expression<Func<T, bool>> GetExpression<T>(List<AppFilterItem> filters)
         {
             // No filters passed in #KickIT
             if (filters.Count == 0)
@@ -62,49 +69,122 @@ namespace DynamicFilterDemo.Extensions
         }
 
 
-        private static Expression GetExpression<T>(ParameterExpression param, AppFilterItem2 filter)
+        private static Expression GetExpression<T>(ParameterExpression param, AppFilterItem filter)
         {
             // The member you want to evaluate (x => x.FirstName)
+            // where yapılacak property alınıyor
             MemberExpression member = Expression.Property(param, filter.PropertyName);
 
             Type type = typeof(T).GetProperty($"{filter.PropertyName}")?.PropertyType!;
 
             // The value you want to evaluate
-            ConstantExpression constant = Expression.Constant(filter.Value);
+            // where şartında ele alınacak değer (search key)
+            //ConstantExpression constant = Expression.Constant(filter.Value);
+            ConstantExpression constant = null;
 
-            var filterValue = filter.Value;
+            //object filterValue = filter.Value;
 
-            if (type == typeof(int))
-            {
-                var aa = 10;
-            }
+            object filterValue = QueryValueConverter.GetValue(filter.Value);
 
-            object value = null;
+            object newValue = null;
 
             if (type == typeof(DateTime) || type == typeof(DateTime?) && filterValue != null)
             {
                 if (DateTime.TryParse(filterValue.ToString(), out DateTime date))
                 {
-                    value = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second);
+                    newValue = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second);
                 }
             }
             else if ((type != typeof(int) && type != typeof(List<int>) && type != typeof(int?)) || filter.Operator != Operator.Equals)
             {
-                value = Convert.ToInt32(filterValue);
+                newValue = AppHelper.ConvertValue(filterValue, type);
             }
 
             // Determine how we want to apply the expression
             switch (filter.Operator)
             {
                 case Operator.Equals:
-                    if (type == typeof(int))
+                    if (type == typeof(int) && filterValue != null && filterValue.ToString().Contains(","))
                     {
-                        value = Convert.ToInt32(filterValue);
-                        return Expression.Equal(member, Expression.Constant(value));
-                    }
-                    return Expression.Equal(member, constant);
+                        var stringValues = filterValue.ToString().Split(",", StringSplitOptions.RemoveEmptyEntries);
 
+                        List<int> values = new List<int>();
+
+                        for (int i = 0; i < stringValues.Length; i++)
+                        {
+                            values.Add(Convert.ToInt32(stringValues[i]));
+                        }
+
+                        constant = Expression.Constant(values);
+                        var item = Expression.Call(constant, intListContainsMethod, member);
+                        return item;
+                    }
+                    else if (type == typeof(int?) && filterValue != null && filterValue.ToString().Contains(","))
+                    {
+                        var stringValues = filterValue.ToString().Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+
+                        List<int?> values = new List<int?>();
+
+                        for (int i = 0; i < stringValues.Length; i++)
+                        {
+                            values.Add(Convert.ToInt32(stringValues[i]));
+                        }
+
+                        constant = Expression.Constant(values);
+
+                        var item = Expression.Call(constant, intListNullableContainsMethod, member);
+                        return item;
+                    }
+                    else if (typeof(IEnumerable<int>).IsAssignableFrom(type) && filterValue != null)
+                    {
+                        if (filterValue.ToString().Contains(","))
+                        {
+                            var stringValues = filterValue.ToString().Split(",", StringSplitOptions.RemoveEmptyEntries);
+
+                            List<int> values = new List<int>();
+
+                            List<int> values2 = new List<int>();
+                            values.Any(p => values2.Contains(p));
+
+                            for (int i = 0; i < stringValues.Length; i++)
+                            {
+                                values.Add(Convert.ToInt32(stringValues[i]));
+                            }
+
+                            Func<int, bool> predicate = p => values.Contains(p);
+
+                            Expression<Func<int, bool>> exp = e => predicate(e);
+
+                            var item = Expression.Call(null, listAnyMethod, member, exp);
+                            return item;
+                        }
+                        else
+                        {
+                            List<int> values = new List<int>();
+
+                            values.Add(Convert.ToInt32(filterValue));
+
+
+                            Func<int, bool> predicate = p => values.Contains(p);
+
+                            Expression<Func<int, bool>> exp = e => predicate(e);
+
+                            var item = Expression.Call(null, listAnyMethod, member, exp);
+                            return item;
+                        }
+                    }
+                    else
+                    {
+                        if (newValue == null)
+                        {
+                            newValue = AppHelper.ConvertValue(filterValue, type);
+                        }
+                        constant = Expression.Constant(newValue);
+                        var item = Expression.Equal(member, constant);
+                        return item;
+                    }
                 case Operator.NotEqual:
+                    constant = Expression.Constant(newValue);
                     return Expression.NotEqual(member, constant);
 
                 case Operator.IsFalse:
@@ -114,30 +194,37 @@ namespace DynamicFilterDemo.Extensions
                     return Expression.Equal(member, Expression.Constant(true));
 
                 case Operator.Contains:
+                    constant = Expression.Constant(newValue);
                     return Expression.Call(member, containsMethod, constant);
 
                 case Operator.GreaterThan:
+                    constant = Expression.Constant(newValue);
                     return Expression.GreaterThan(member, constant);
 
                 case Operator.GreaterThanOrEqual:
+                    constant = Expression.Constant(newValue, type);
                     return Expression.GreaterThanOrEqual(member, constant);
 
                 case Operator.LessThan:
+                    constant = Expression.Constant(newValue);
                     return Expression.LessThan(member, constant);
 
                 case Operator.LessThanOrEqualTo:
+                    constant = Expression.Constant(newValue, type);
                     return Expression.LessThanOrEqual(member, constant);
 
                 case Operator.StartsWith:
+                    constant = Expression.Constant(newValue);
                     return Expression.Call(member, startsWithMethod, constant);
 
                 case Operator.EndsWith:
+                    constant = Expression.Constant(newValue);
                     return Expression.Call(member, endsWithMethod, constant);
             }
             return null;
         }
 
-        private static BinaryExpression GetExpression<T>(ParameterExpression param, AppFilterItem2 filter1, AppFilterItem2 filter2)
+        private static BinaryExpression GetExpression<T>(ParameterExpression param, AppFilterItem filter1, AppFilterItem filter2)
         {
             Expression result1 = GetExpression<T>(param, filter1);
             Expression result2 = GetExpression<T>(param, filter2);

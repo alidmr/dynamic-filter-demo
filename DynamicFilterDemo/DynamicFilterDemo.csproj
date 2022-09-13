@@ -2,13 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\js\plugins\dataTables\dataTables.bootstrap4.min.js" />
-    <None Include="wwwroot\js\plugins\dataTables\datatables.min.js" />
+    <Compile Remove="wwwroot\js\plugins\**" />
+    <Content Remove="wwwroot\js\plugins\**" />
+    <EmbeddedResource Remove="wwwroot\js\plugins\**" />
+    <None Remove="wwwroot\js\plugins\**" />
   </ItemGroup>
 
   <ItemGroup>

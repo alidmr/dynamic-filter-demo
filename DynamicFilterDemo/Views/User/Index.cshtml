@@ -6,7 +6,6 @@
 
 <div class="row mb-2">
     <div class="col-md-12">
-        <button id="BtnFilter" class="btn btn-primary" type="button">Filtre</button>
         <button id="BtnRefresh" class="btn btn-success" type="button">Yenile</button>
     </div>
 </div>
@@ -16,27 +15,32 @@
         <div class="card">
             <div class="card-body">
                 <form class="SearchForm" id="UserSearchForm">
-                    <div class="row">
-                        <label>Id</label>
-                        <div class="col-md-6">
-                            <input type="number" id="Id" name="Id" class="form-control" />
-                        </div>
-                        <div class="col-md-6">
-                            <select class="form-select" id="Id_ConditionType" name="Id_ConditionType">
-                                <option value="select">Seçiniz</option>
-                                <option value="8">Eşit</option>
-                                <option value="9">Eşit Değil</option>
-                                <option value="4">Küçük</option>
-                                <option value="5">Küçük Eşit</option>
-                                <option value="2">Büyük</option>
-                                <option value="3">Büyük Eşit</option>
-                                <option value="6">Bununla Başlayan</option>
-                                <option value="7">Bununla Biten</option>
-                                <option value="1">İçerisinde</option>
-                                <option value="10">İçerisinde Değil</option>
-                            </select>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <label>Id</label>
+                                <div class="col-md-6">
+                                    <input type="number" id="Id" name="Id" class="form-control" />
+                                </div>
+                                <div class="col-md-6">
+                                    <select class="form-select" id="Id_ConditionType" name="Id_ConditionType">
+                                        <option value="select">Seçiniz</option>
+                                        <option value="8">Eşit</option>
+                                        <option value="9">Eşit Değil</option>
+                                        <option value="4">Küçük</option>
+                                        <option value="5">Küçük Eşit</option>
+                                        <option value="2">Büyük</option>
+                                        <option value="3">Büyük Eşit</option>
+                                        <option value="6">Bununla Başlayan</option>
+                                        <option value="7">Bununla Biten</option>
+                                        <option value="1">İçerisinde</option>
+                                        <option value="10">İçerisinde Değil</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
                     <div class="row">
                         <label>Ad</label>
                         <div class="col-md-6">
@@ -115,7 +119,7 @@
                             </select>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <label>Aktif Mi</label>
@@ -125,6 +129,24 @@
                                 <option value="select">Seçiniz</option>
                                 <option value="11">Evet</option>
                                 <option value="12">Hayır</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label>Oluşturulma Tarihi</label>
+                        <div class="col-md-6">
+                            <input type="date" id="CreatedDate" name="CreatedDate" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-select" id="CreatedDate_ConditionType" name="CreatedDate_ConditionType">
+                                <option value="select">Seçiniz</option>
+                                <option value="8">Eşit</option>
+                                <option value="9">Eşit Değil</option>
+                                <option value="4">Küçük</option>
+                                <option value="5">Küçük Eşit</option>
+                                <option value="2">Büyük</option>
+                                <option value="3">Büyük Eşit</option>
                             </select>
                         </div>
                     </div>
@@ -170,6 +192,6 @@
 
 @section Scripts
     {
-    <script src="~/js/user.js"></script>
+    <script src="~/js/pages/user.js"></script>
 
 }
